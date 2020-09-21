@@ -1,22 +1,12 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { get, set, clear } from "idb-keyval";
 import { makeStyles } from "@material-ui/core/styles";
-import mitt from "mitt";
-import {
-  Typography,
-  Container,
-  CssBaseline,
-  Button,
-  Snackbar,
-  IconButton,
-} from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+import { Typography, Container, CssBaseline } from "@material-ui/core";
 import AppBar from "./AppBar";
 import HolidaysBreakdownCard from "./HolidaysBreakdownCard";
 import HolidayCard from "./HolidayCard";
+import AppUpdate from "./AppUpdate";
 import "./App.css";
-
-export const emitter = mitt();
 
 // {
 //   "1": {
@@ -48,7 +38,6 @@ const useStyles = makeStyles((theme) => ({
 
 function App() {
   const classes = useStyles();
-  const [serviceWorkerWaiting, setServiceWorkerWaiting] = useState();
   const [holidaysAllowance, setHolidaysAllowance] = useState(
     DEFAULT_HOLIDAYS_ALLOWANCE
   );
@@ -96,33 +85,12 @@ function App() {
     clear();
   };
 
-  const updateApp = () => {
-    if (serviceWorkerWaiting) {
-      serviceWorkerWaiting.postMessage({ type: "SKIP_WAITING" });
-      serviceWorkerWaiting.addEventListener("statechange", (e) => {
-        if (e.target.state === "activated") {
-          window.location.reload();
-        }
-      });
-    } else {
-      setServiceWorkerWaiting(false);
-    }
-  };
-
   useEffect(() => {
     get("holidays").then((val = {}) => {
       setHolidays(val);
     });
     get("holidaysAllowance").then((val = DEFAULT_HOLIDAYS_ALLOWANCE) => {
       setHolidaysAllowance(parseFloat(val));
-    });
-
-    emitter.on("SERVICE_WORKER_UPDATE", (registration) => {
-      const registrationWaiting = registration.waiting;
-
-      if (registrationWaiting) {
-        setServiceWorkerWaiting(registrationWaiting);
-      }
     });
   }, []);
 
@@ -157,35 +125,7 @@ function App() {
                 <HolidayCard />
               </Fragment>
             )}
-            <Snackbar
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              open={serviceWorkerWaiting}
-              onClose={() => {}}
-              message="New update available!"
-              action={
-                <Fragment>
-                  <Button
-                    className={classes.updateButton}
-                    color="secondary"
-                    size="small"
-                    onClick={updateApp}
-                  >
-                    Update now
-                  </Button>
-                  <IconButton
-                    size="small"
-                    aria-label="close"
-                    color="inherit"
-                    onClick={() => setServiceWorkerWaiting(false)}
-                  >
-                    <CloseIcon fontSize="small" />
-                  </IconButton>
-                </Fragment>
-              }
-            />
+            <AppUpdate />
           </Container>
         </main>
       </AppContext.Provider>
