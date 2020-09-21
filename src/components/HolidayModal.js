@@ -94,12 +94,7 @@ export default function HolidayModal({ open, handleClose, edit, id }) {
   };
 
   return (
-    <Dialog
-      fullScreen
-      open={open}
-      onClose={handleClose}
-      TransitionComponent={Transition}
-    >
+    <Dialog fullScreen open={open} TransitionComponent={Transition}>
       <AppBar className={classes.appBar} color="inherit">
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
@@ -210,7 +205,7 @@ export default function HolidayModal({ open, handleClose, edit, id }) {
             </Button>
             <Button
               onClick={() => {
-                setShouldShowRemoveHolidaysDialog(false);
+                handleClose();
                 removeHolidays(id);
               }}
               color="primary"

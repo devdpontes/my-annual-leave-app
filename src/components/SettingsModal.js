@@ -44,6 +44,33 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+function ClearDataDialog({ open, onCancel, onConfirm }) {
+  return (
+    <Dialog
+      open={open}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle id="alert-dialog-title">
+        Are you sure you want to clear all data?
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description">
+          Warning: This action will clear all saved settings and holidays.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onCancel} color="primary">
+          No
+        </Button>
+        <Button onClick={onConfirm} color="primary" autoFocus>
+          Yes
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 export default function SettingsModal({ open, handleClose }) {
   const classes = useStyles();
   const { holidaysAllowance, editHolidaysAllowance, clearData } = useContext(
@@ -107,43 +134,16 @@ export default function SettingsModal({ open, handleClose }) {
         >
           Clear data
         </Button>
-        {shouldShowClearDataDialog && (
-          <Dialog
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogTitle id="alert-dialog-title">
-              Are you sure you want to clear all data?
-            </DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                Warning: This action will clear all saved settings and holidays.
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                onClick={() => {
-                  setShouldShowClearDataDialog(false);
-                }}
-                color="primary"
-              >
-                No
-              </Button>
-              <Button
-                onClick={() => {
-                  setShouldShowClearDataDialog(false);
-                  clearData();
-                }}
-                color="primary"
-                autoFocus
-              >
-                Yes
-              </Button>
-            </DialogActions>
-          </Dialog>
-        )}
+        <ClearDataDialog
+          open={shouldShowClearDataDialog}
+          onCancel={() => {
+            setShouldShowClearDataDialog(false);
+          }}
+          onConfirm={() => {
+            setShouldShowClearDataDialog(false);
+            clearData();
+          }}
+        />
       </Container>
     </Dialog>
   );
